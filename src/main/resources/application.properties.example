@@ -1,0 +1,8 @@
+spring.application.name=jigju-server
+
+naver.apiUrl=https://openapi.naver.com
+naver.clientId=naver_client_id
+naver.clientSecret=naver_client_secret
+
+kakao.apiUrl=https://dapi.kakao.com
+kakao.authorization=KakaoAK kakao_authoraziation
