@@ -2,7 +2,6 @@ package com.jigju.server.search.service;
 
 import com.jigju.server.search.entity.SearchKeyword;
 import com.jigju.server.search.repository.SearchKeywordRepository;
-import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,6 @@ public class SearchKeywordService {
                   });
     }
 
-    @Cacheable(value = "topKeywords", key = "'top10'")
     public List<SearchKeyword> getTopSearchKeywords() {
         return repository.findTop10ByOrderByCountDesc();
     }
