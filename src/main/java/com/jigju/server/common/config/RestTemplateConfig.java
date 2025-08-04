@@ -1,4 +1,4 @@
-package com.jigju.server.config;
+package com.jigju.server.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

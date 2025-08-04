@@ -1,4 +1,4 @@
-package com.jigju.server.config;
+package com.jigju.server.external.config;
 
 import lombok.Getter;
 import lombok.Setter;
