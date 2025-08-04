@@ -1,5 +1,6 @@
 package com.jigju.server.search.service;
 
+import com.jigju.server.search.dto.SearchResponse;
 import com.jigju.server.search.entity.SearchKeyword;
 import com.jigju.server.search.repository.SearchKeywordRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +17,17 @@ public class SearchKeywordService {
     private final SearchKeywordRepository repository;
 
     @Async
-    public void recordKeywordAsync(String keyword) {
-        CompletableFuture.runAsync(() -> recordKeyword(keyword));
+    public void recordKeywordAsync(SearchResponse.LocationItem item) {
+        CompletableFuture.runAsync(() -> recordKeyword(item));
     }
 
-    private void recordKeyword(String keyword) {
-        repository.findByKeyword(keyword)
+    private void recordKeyword(SearchResponse.LocationItem item) {
+        repository.findByKeyword(item.getTitle())
                   .ifPresentOrElse(entity -> {
                       entity.incrementCount();
                       repository.save(entity);
-                  }, () -> {
-                      SearchKeyword newKeyword = new SearchKeyword(keyword);
-                      repository.save(newKeyword);
-                  });
+                  }, () -> repository.save(item.toEntity()));
+
     }
 
     public List<SearchKeyword> getTopSearchKeywords() {

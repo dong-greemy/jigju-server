@@ -18,6 +18,18 @@ public class SearchKeyword {
     private String keyword;
 
     @Column(nullable = false)
+    private String category;
+
+    @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = false)
+    private String mapx;
+
+    @Column(nullable = false)
+    private String mapy;
+
+    @Column(nullable = false)
     private int count;
 
     @Column(name = "created_at", updatable = false)
@@ -28,8 +40,12 @@ public class SearchKeyword {
 
     protected SearchKeyword() {};
 
-    public SearchKeyword(String keyword) {
+    public SearchKeyword(String keyword, String address, String category, String mapx, String mapy) {
         this.keyword = keyword;
+        this.address = address;
+        this.category = category;
+        this.mapx = mapx;
+        this.mapy = mapy;
         this.count = 1;
     }
 

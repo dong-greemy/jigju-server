@@ -29,17 +29,14 @@ public class SearchController {
 
     @GetMapping("/location")
 
-    public ResponseEntity<ApiResponse<Object>> searchLocation(
-            @RequestParam String query
-    ) {
-        URI url = UriComponentsBuilder
-                .fromUriString(naverConfig.getApiUrl())
-                .path("/v1/search/local.json")
-                .queryParam("query", query)
-                .queryParam("display", DEFAULT_DISPLAY_COUNT)
-                .encode()
-                .build()
-                .toUri();
+    public ResponseEntity<ApiResponse<Object>> searchLocation(@RequestParam String query) {
+        URI url = UriComponentsBuilder.fromUriString(naverConfig.getApiUrl())
+                                      .path("/v1/search/local.json")
+                                      .queryParam("query", query)
+                                      .queryParam("display", DEFAULT_DISPLAY_COUNT)
+                                      .encode()
+                                      .build()
+                                      .toUri();
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Naver-Client-Id", naverConfig.getClientId());
@@ -48,37 +45,30 @@ public class SearchController {
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<SearchResponse> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    SearchResponse.class
-            );
+            ResponseEntity<SearchResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, SearchResponse.class);
 
             SearchResponse body = response.getBody();
             if (body == null || body.getItems() == null) {
                 return ResponseEntity.ok(ApiResponse.success(List.of()));
             }
 
-            searchKeywordService.recordKeywordAsync(query);
-
             return ResponseEntity.ok(ApiResponse.success(body.getItems()));
         } catch (Exception e) {
             ErrorResponse errorResponse = restTemplate.getForObject(url, ErrorResponse.class);
 
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error(errorResponse));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(ApiResponse.error(errorResponse));
         }
     }
 
     @GetMapping("/popular")
     public ResponseEntity<ApiResponse<Object>> popularKeywords() {
         List<SearchKeyword> topKeywords = searchKeywordService.getTopSearchKeywords();
-        List<String> result = topKeywords.stream()
-                                         .map(SearchKeyword::getKeyword)
-                                         .collect(Collectors.toList());
-        return ResponseEntity.ok(ApiResponse.success(result));
+        return ResponseEntity.ok(ApiResponse.success(topKeywords));
     }
 
+    @PostMapping("/record")
+    public void recordKeyword(@RequestBody SearchResponse.LocationItem item) {
+        searchKeywordService.recordKeywordAsync(item);
+    }
 }

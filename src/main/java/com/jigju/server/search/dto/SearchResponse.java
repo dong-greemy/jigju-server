@@ -1,6 +1,7 @@
 package com.jigju.server.search.dto;
 
 
+import com.jigju.server.search.entity.SearchKeyword;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,5 +22,19 @@ public class SearchResponse {
         private String title;
         private String address;
         private String category;
+        private String mapx;
+        private String mapy;
+
+        public SearchKeyword toEntity() {
+            return new SearchKeyword(
+                    this.title,
+                    this.address,
+                    this.category,
+                    this.mapx,
+                    this.mapy
+            );
+        }
     }
+
+
 }
