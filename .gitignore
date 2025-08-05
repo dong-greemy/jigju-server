@@ -37,3 +37,7 @@ out/
 .vscode/
 
 /src/main/resources/application.properties
+
+### Docker ###
+.docker/
+docker-compose.override.yml
