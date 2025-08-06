@@ -36,7 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 
-/src/main/resources/application.properties
+/src/**/resources/application*.properties
 
 ### Docker ###
 .docker/
