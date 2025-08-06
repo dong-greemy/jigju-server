@@ -41,3 +41,5 @@ out/
 ### Docker ###
 .docker/
 docker-compose.override.yml
+
+.env
