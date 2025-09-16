@@ -20,6 +20,7 @@ configurations {
 }
 
 repositories {
+	maven { url = uri("https://repo.osgeo.org/repository/release/") }
 	mavenCentral()
 }
 
@@ -34,6 +35,13 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	// GeoTools 좌표 변환 관련
+	implementation("org.geotools:gt-referencing:33.2")
+	implementation("org.geotools:gt-epsg-hsql:33.2")
+
+	// JTS Geometry
+	implementation("org.locationtech.jts:jts-core:1.19.0")
 }
 
 tasks.withType<Test> {
