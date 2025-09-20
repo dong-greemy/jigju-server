@@ -38,7 +38,7 @@ public class LocationResponse {
     @Getter
     @Setter
     public static class Page {
-        private String total;
+        private int total;
         private String current;
         private String size;
     }

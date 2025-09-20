@@ -9,15 +9,15 @@ import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.WKTWriter;
 
 public class GeoUtils {
-    //    private static final double BUS_AVERAGE_SPEED = 0.23;
-
+    private static final double BUS_AVERAGE_SPEED_KM_PER_MIN = 0.23;
     private static final double SUBWAY_AVERAGE_SPEED_KM_PER_MIN = 0.55;
+    private static final double NARROW_CIRCLE = 0.1;
     private static final int POLYGON_SIDES = 64;
 
     private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     public static double calculateRadiusKm(int min) {
-        return SUBWAY_AVERAGE_SPEED_KM_PER_MIN * min * 1000;
+        return NARROW_CIRCLE * min * 1000;
     }
 
     public static String generateCircularPolygonWKT(double lon, double lat, int time) throws Exception {
