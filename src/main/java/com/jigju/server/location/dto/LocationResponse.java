@@ -61,7 +61,7 @@ public class LocationResponse {
     @Setter
     public static class Feature {
         private String type;
-//        private Geometry geometry;
+        private Geometry geometry;
         private Properties properties;
         private String id;
     }

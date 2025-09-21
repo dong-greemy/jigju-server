@@ -14,5 +14,6 @@ public record ApiResponse<T>(T data, ErrorResponse error, LocalDateTime timestam
     public static <T> ApiResponse<T> error(ErrorResponse error) {
         return new ApiResponse<>(null, error, LocalDateTime.now());
     }
+
 }
 

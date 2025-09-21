@@ -9,8 +9,8 @@ import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.WKTWriter;
 
 public class GeoUtils {
-    private static final double BUS_AVERAGE_SPEED_KM_PER_MIN = 0.23;
-    private static final double SUBWAY_AVERAGE_SPEED_KM_PER_MIN = 0.55;
+//    private static final double BUS_AVERAGE_SPEED_KM_PER_MIN = 0.23;
+//    private static final double SUBWAY_AVERAGE_SPEED_KM_PER_MIN = 0.55;
     private static final double NARROW_CIRCLE = 0.1;
     private static final int POLYGON_SIDES = 64;
 
@@ -21,11 +21,6 @@ public class GeoUtils {
     }
 
     public static String generateCircularPolygonWKT(double lon, double lat, int time) throws Exception {
-//        double[] coordinates = generateEPSG4326Coordinate(mapx, mapy);
-//        double lon = coordinates[0];
-//        double lat = coordinates[1];
-
-        // GeoTools의 GeodeticCalculator (기본 WGS84 사용)
         double radiusKm = calculateRadiusKm(time);
 
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326");
@@ -49,10 +44,26 @@ public class GeoUtils {
         return new WKTWriter().write(polygon).replace(" ((", "((");
     }
 
-    public static double[] generateEPSG4326Coordinate(String rawX, String rawY) {
-        double lon = Double.parseDouble(rawX.substring(0, 3) + "." + rawX.substring(3));
-        double lat = Double.parseDouble(rawY.substring(0, 2) + "." + rawY.substring(2));
-        return new double[]{lon, lat};
-    }
+    public static Coordinate findCentroid (Coordinate[] points) {
+        double area = 0, x = 0, y = 0;
+        int len = points.length;
+        Coordinate p1, p2;
+        double f;
 
+        for (int i = 0, j = len - 1; i < len; j = i++) {
+            p1 = points[i];
+            p2 = points[j];
+
+            f = p1.x * p2.y - p2.x * p1.y;
+            x += (p1.x + p2.x) * f;
+            y += (p1.y + p2.y) * f;
+            area += f;
+        }
+
+        area /= 2.0; // 다각형 면적
+        x /= (6.0 * area);
+        y /= (6.0 * area);
+
+        return  new Coordinate(x, y);
+    }
 }

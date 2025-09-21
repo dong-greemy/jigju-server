@@ -1,10 +1,12 @@
 package com.jigju.server.location.controller;
 
 import com.jigju.server.common.dto.ApiResponse;
+import com.jigju.server.location.dto.EmdDestinationResponse;
+import com.jigju.server.location.dto.GeocoderAddressResponse;
 import com.jigju.server.location.dto.LocationResponse;
-import com.jigju.server.location.entity.EmdOfficeLocation;
 import com.jigju.server.location.service.NearbyLocationService;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,24 +22,29 @@ public class NearbyLocationController {
     private final NearbyLocationService nearbyLocationService;
 
     @GetMapping("/polygon")
-//    public ResponseEntity<ApiResponse<Object>> getNearbyPolygon(
-    public ArrayList<LocationResponse.Properties> getNearbyPolygon(
+    public ArrayList<LocationResponse.Feature> getNearbyPolygon(
             @RequestParam double x,
             @RequestParam double y,
             @RequestParam int time) throws Exception {
-        return nearbyLocationService.getNearbyDistricts(x, y, time);
+        return nearbyLocationService.getNeighboringDistricts(x, y, time);
     }
 
-    @GetMapping("/geocode")
-    public ResponseEntity<ApiResponse<Object>> getGeocode(@RequestParam String address) throws Exception {
-        return nearbyLocationService.getGeocoder(address);
+    @GetMapping("/geocoder/coords")
+    public ResponseEntity<ApiResponse<Object>> getCoords(@RequestParam String address) throws Exception {
+        return nearbyLocationService.convertAddressToCoords(address);
     }
 
-    @GetMapping("/emdOffices")
-    public ArrayList<EmdOfficeLocation> getEmdOffices(
+    @GetMapping("/geocoder/address")
+    public ResponseEntity<ApiResponse<GeocoderAddressResponse>> getAddress(@RequestParam double x, double y) throws Exception {
+        Coordinate coords = new Coordinate(x, y);
+        return nearbyLocationService.convertCoordsToAddress(coords);
+    }
+
+    @GetMapping("/nearbyEmd")
+    public ArrayList<EmdDestinationResponse> getNearbyEmds(
             @RequestParam double x,
             @RequestParam double y,
             @RequestParam int time) throws Exception {
-        return nearbyLocationService.getNearbyEmdOffices(x, y, time);
+        return nearbyLocationService.getNearbyEmds(x, y, time);
     }
 }
