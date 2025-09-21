@@ -2,6 +2,7 @@ package com.jigju.server.location.controller;
 
 import com.jigju.server.common.dto.ApiResponse;
 import com.jigju.server.location.dto.LocationResponse;
+import com.jigju.server.location.entity.EmdOfficeLocation;
 import com.jigju.server.location.service.NearbyLocationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,5 +31,13 @@ public class NearbyLocationController {
     @GetMapping("/geocode")
     public ResponseEntity<ApiResponse<Object>> getGeocode(@RequestParam String address) throws Exception {
         return nearbyLocationService.getGeocoder(address);
+    }
+
+    @GetMapping("/emdOffices")
+    public ArrayList<EmdOfficeLocation> getEmdOffices(
+            @RequestParam double x,
+            @RequestParam double y,
+            @RequestParam int time) throws Exception {
+        return nearbyLocationService.getNearbyEmdOffices(x, y, time);
     }
 }

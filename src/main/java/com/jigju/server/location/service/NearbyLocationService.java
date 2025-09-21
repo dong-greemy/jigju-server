@@ -5,6 +5,8 @@ import com.jigju.server.common.dto.ErrorResponse;
 import com.jigju.server.external.config.VWorldConfig;
 import com.jigju.server.location.dto.GeocodeResponse;
 import com.jigju.server.location.dto.LocationResponse;
+import com.jigju.server.location.entity.EmdOfficeLocation;
+import com.jigju.server.location.repository.EmdOfficeLocationRepository;
 import com.jigju.server.location.util.GeoUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -26,14 +28,15 @@ public class NearbyLocationService {
 
     public ResponseEntity<ApiResponse<LocationResponse>> getNearbyCenters(String polygon, int page, HttpEntity<Void> entity) throws Exception {
 
-        URI url =  findLocationUriBuilder(polygon, page);
+        URI url = findLocationUriBuilder(polygon, page);
 
         try {
             ResponseEntity<LocationResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, LocationResponse.class);
 
             return ResponseEntity.ok(ApiResponse.success(response.getBody()));
         } catch (Exception e) {
-            System.out.println("[CENTERS][EX] " + e.getClass().getName() + ": " + e.getMessage());
+            System.out.println("[CENTERS][EX] " + e.getClass()
+                                                   .getName() + ": " + e.getMessage());
 
             ErrorResponse errorResponse = restTemplate.getForObject(url, ErrorResponse.class);
 
@@ -42,7 +45,7 @@ public class NearbyLocationService {
         }
     }
 
-    public  ArrayList<LocationResponse.Properties> getNearbyDistricts(double startX, double startY, int time) throws Exception {
+    public ArrayList<LocationResponse.Properties> getNearbyDistricts(double startX, double startY, int time) throws Exception {
         String polygon = GeoUtils.generateCircularPolygonWKT(startX, startY, time);
         System.out.println("Polygon: " + polygon);
         ArrayList<LocationResponse.Properties> properties = new ArrayList<>();
@@ -55,19 +58,31 @@ public class NearbyLocationService {
         int curPage = 1;
         int maxPage = Integer.MAX_VALUE;
 
-        while(curPage <= maxPage) {
+        while (curPage <= maxPage) {
             ResponseEntity<ApiResponse<LocationResponse>> responseEntity = getNearbyCenters(polygon, curPage, entity);
-            if (!responseEntity.getStatusCode().is2xxSuccessful()) break;
+            if (!responseEntity.getStatusCode()
+                               .is2xxSuccessful()) break;
 
-            LocationResponse locationResponse = responseEntity.getBody().data();
+            LocationResponse locationResponse = responseEntity.getBody()
+                                                              .data();
 
             if (curPage == 1) {
-                maxPage = locationResponse.getResponse().getPage().getTotal();
-                System.out.println("Total:"+locationResponse.getResponse().getRecord().getTotal());
+                maxPage = locationResponse.getResponse()
+                                          .getPage()
+                                          .getTotal();
+                System.out.println("Total:" + locationResponse.getResponse()
+                                                              .getRecord()
+                                                              .getTotal());
             }
 
-            System.out.println("cur page:"+curPage);
-            locationResponse.getResponse().getResult().getFeatureCollection().getFeatures().stream().map(LocationResponse.Feature::getProperties).forEach(properties::add);
+            System.out.println("cur page:" + curPage);
+            locationResponse.getResponse()
+                            .getResult()
+                            .getFeatureCollection()
+                            .getFeatures()
+                            .stream()
+                            .map(LocationResponse.Feature::getProperties)
+                            .forEach(properties::add);
             curPage++;
         }
 
@@ -127,4 +142,33 @@ public class NearbyLocationService {
                                  .body(ApiResponse.error(errorResponse));
         }
     }
+
+    private final EmdOfficeLocationRepository administrativeEmdRepository;
+
+    public ArrayList<EmdOfficeLocation> findMatchedEmdOffices(ArrayList<LocationResponse.Properties> properties) throws Exception {
+        ArrayList<EmdOfficeLocation> matchedOffices = new ArrayList<>();
+
+        for (LocationResponse.Properties props : properties) {
+            String[] addressParts = props.getFull_nm()
+                                         .split(" ");
+            System.out.println("addressParts: " + addressParts[0] + " " + addressParts[1]+  props.getEmd_kor_nm());
+            matchedOffices.add(administrativeEmdRepository.findMatchedEmdOffice(addressParts[0], addressParts[1], props.getEmd_kor_nm()));
+        }
+        return matchedOffices;
+    }
+
+    public ArrayList<EmdOfficeLocation> getNearbyEmdOffices(double startX, double startY, int time) throws Exception {
+        try {
+            ArrayList<LocationResponse.Properties> properties = getNearbyDistricts(startX, startY, time);
+            return findMatchedEmdOffices(properties);
+
+        } catch (Exception e) {
+            System.out.println("getNearbyEmdOffices 처리 중 오류 발생" + e.getMessage());
+            throw e;
+        }
+    }
+
+//    public ArrayList<String> findEmdHaenjeongCode(ArrayList<LocationResponse.Properties> properties) {
+//
+//    }
 }
